@@ -11,15 +11,6 @@ type Results struct {
 	ErrorMessage      string           `json:"error"`
 }
 
-// OrganicResult ...
-type OrganicResult struct {
-	Title          string `json:"title"`
-	CachedPageLink string `json:"cached_page_link,omitempty"`
-	DisplayedLink  string `json:"displayed_link,omitempty"`
-	Link           string `json:"link,omitempty"`
-	Snippet        string `json:"snippet,omitempty"`
-}
-
 // Params are search parameters
 type Params struct {
 	Device            string `json:"device"`
@@ -60,8 +51,20 @@ type ShoppingResult struct {
 	Rating            int      `json:"rating"`
 	Reviews           int      `json:"reviews"`
 	SerpapiProductAPI string   `json:"serpapi_product_api"`
+	Source            string   `json:"source"`
 	Snippet           string   `json:"snippet"`
 	Thumbnail         string   `json:"thumbnail"`
 	Title             string   `json:"title"`
 	Price             string   `json:"price"`
+}
+
+// OrganicResult ...
+type OrganicResult struct {
+	Title          string `json:"title,omitempty"`
+	CachedPageLink string `json:"cached_page_link,omitempty"`
+	DisplayedLink  string `json:"displayed_link,omitempty"`
+	Link           string `json:"link,omitempty"`
+	Source         string `json:"source"`
+	Snippet        string `json:"snippet,omitempty"`
+	Price          string `json:"price,omitempty"`
 }

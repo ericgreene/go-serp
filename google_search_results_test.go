@@ -48,8 +48,8 @@ func TestQuickStart(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	result := rsp["organic_results"].([]interface{})[0].(map[string]interface{})
-	if len(result["title"].(string)) == 0 {
+
+	if len(rsp.OrganicResults[0].Title) == 0 {
 		t.Error("empty title in local results")
 		return
 	}
@@ -75,8 +75,8 @@ func TestJSON(t *testing.T) {
 		t.Error("unexpected error", err)
 		return
 	}
-	result := rsp["organic_results"].([]interface{})[0].(map[string]interface{})
-	if len(result["title"].(string)) == 0 {
+	result := rsp.OrganicResults[0]
+	if len(result.Title) == 0 {
 		t.Error("empty title in local results")
 		return
 	}
@@ -99,8 +99,8 @@ func TestJSONwithGlobalKey(t *testing.T) {
 		t.Error("unexpected error", err)
 		return
 	}
-	result := rsp["organic_results"].([]interface{})[0].(map[string]interface{})
-	if len(result["title"].(string)) == 0 {
+	result := rsp.OrganicResults[0]
+	if len(result.Title) == 0 {
 		t.Error("empty title in local results")
 		return
 	}
@@ -141,9 +141,7 @@ func TestDecodeJson(t *testing.T) {
 		return
 	}
 
-	results := rsp["organic_results"].([]interface{})
-	ref := results[0].(map[string]interface{})
-	if ref["title"] != "Portland Roasting Coffee" {
+	if rsp.OrganicResults[0].Title != "Portland Roasting Coffee" {
 		t.Error("empty title in local results")
 		return
 	}
@@ -162,10 +160,8 @@ func TestDecodeJsonPage20(t *testing.T) {
 		t.Error(err)
 	}
 	t.Log(reflect.ValueOf(rsp).MapKeys())
-	results := rsp["organic_results"].([]interface{})
-	ref := results[0].(map[string]interface{})
-	t.Log(ref["title"].(string))
-	if ref["title"].(string) != "Coffee | HuffPost" {
+
+	if rsp.OrganicResults[0].Title != "Coffee | HuffPost" {
 		t.Error("fail decoding the title ")
 	}
 }
@@ -176,9 +172,9 @@ func TestDecodeJsonError(t *testing.T) {
 		panic(err)
 	}
 	var sq SerpQuery
-	rsp, err := sq.decodeJSON(reader)
-	if rsp != nil {
-		t.Error("response should not be nil")
+	_, err = sq.decodeJSON(reader)
+	if err != nil {
+		t.Error(err)
 		return
 	}
 
@@ -210,28 +206,28 @@ func TestGetLocation(t *testing.T) {
 	}
 }
 
-func TestGetAccount(t *testing.T) {
-	// Skip this test
-	if len(os.Getenv("API_KEY")) == 0 {
-		t.Skip("API_KEY required")
-		return
-	}
+// func TestGetAccount(t *testing.T) {
+// 	// Skip this test
+// 	if len(os.Getenv("API_KEY")) == 0 {
+// 		t.Skip("API_KEY required")
+// 		return
+// 	}
 
-	setup()
+// 	setup()
 
-	var rsp SerpResponse
-	var err error
-	rsp, err = GetAccount()
+// 	var rsp SerpResponse
+// 	var err error
+// 	rsp, err = GetAccount()
 
-	if err != nil {
-		t.Error(err)
-	}
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
 
-	if rsp["account_id"] == nil {
-		t.Error("no account_id found")
-		return
-	}
-}
+// 	if rsp["account_id"] == nil {
+// 		t.Error("no account_id found")
+// 		return
+// 	}
+// }
 
 // Search archive API
 func TestSearchArchive(t *testing.T) {
@@ -254,7 +250,7 @@ func TestSearchArchive(t *testing.T) {
 		return
 	}
 
-	searchID := rsp["search_metadata"].(map[string]interface{})["id"].(string)
+	searchID := rsp.SearchMetadata.ID
 
 	if len(searchID) == 0 {
 		t.Error("search_metadata.id must be defined")
@@ -266,8 +262,7 @@ func TestSearchArchive(t *testing.T) {
 		return
 	}
 
-	searchIDArchive := searchArchive["search_metadata"].(map[string]interface{})["id"].(string)
-	if searchIDArchive != searchID {
-		t.Error("search_metadata.id do not match", searchIDArchive, searchID)
+	if searchArchive.SearchMetadata.ID != searchID {
+		t.Error("search_metadata.id do not match", searchArchive.SearchMetadata.ID, searchID)
 	}
 }

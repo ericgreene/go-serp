@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	g "github.com/serpapi/google-search-results-golang"
 	"os"
+
+	g "github.com/ericgreene/google-search-results-golang"
 )
 
 /***
@@ -24,7 +25,5 @@ func main() {
 		fmt.Println("error: ", err)
 		return
 	}
-	results := serpResponse["organic_results"].([]interface{})
-	firstResult := results[0].(map[string]interface{})
-	fmt.Println(firstResult["title"].(string))
+	fmt.Println(serpResponse.OrganicResults[0].Title)
 }

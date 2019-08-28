@@ -42,7 +42,7 @@ func setAPIKey(key string) {
 }
 
 // GetJSON returns SerpResponse containing
-func (sq *SerpQuery) GetJSON() (SerpResponse, error) {
+func (sq *SerpQuery) GetJSON() (Results, error) {
 	rsp := sq.execute("/search", "json")
 	return sq.decodeJSON(rsp.Body)
 }
@@ -64,35 +64,35 @@ func GetLocation(q string, limit int) (SerpResponseArray, error) {
 }
 
 // GetAccount return account information
-func GetAccount() (SerpResponse, error) {
-	client := NewGoogleSearch(map[string]string{})
-	rsp := client.execute("/account", "json")
-	return client.decodeJSON(rsp.Body)
-}
+// func GetAccount() (Results, error) {
+// 	client := NewGoogleSearch(map[string]string{})
+// 	rsp := client.execute("/account", "json")
+// 	return client.decodeJSON(rsp.Body)
+// }
 
 // GetSearchArchive retrieve search from the archive using the Search Archive API
-func (sq *SerpQuery) GetSearchArchive(searchID string) (SerpResponse, error) {
+func (sq *SerpQuery) GetSearchArchive(searchID string) (Results, error) {
 	rsp := sq.execute("/searches/"+searchID+".json", "json")
 	return sq.decodeJSON(rsp.Body)
 }
 
 // decodeJson response
-func (sq *SerpQuery) decodeJSON(body io.ReadCloser) (SerpResponse, error) {
+func (sq *SerpQuery) decodeJSON(body io.ReadCloser) (Results, error) {
 	// Decode JSON from response body
 	decoder := json.NewDecoder(body)
-	//var serpResponse SerpResponse
-	var serpResponse SerpResponse
-	err := decoder.Decode(&serpResponse)
+	// var serpResponse SerpResponse
+	var resp Results
+	err := decoder.Decode(&resp)
 	if err != nil {
-		return nil, errors.New("fail to decode")
+		return resp, errors.New("fail to decode")
 	}
 
 	// check error message
-	errorMessage, derror := serpResponse["error"].(string)
-	if derror {
-		return nil, errors.New(errorMessage)
+	if resp.ErrorMessage != "" {
+		return resp, errors.New(resp.ErrorMessage)
 	}
-	return serpResponse, nil
+
+	return resp, nil
 }
 
 // decodeJSONArray primitive function
