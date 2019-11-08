@@ -68,4 +68,5 @@ type OrganicResult struct {
 	Source         string `json:"source"`
 	Snippet        string `json:"snippet,omitempty"`
 	Price          string `json:"price,omitempty"`
+	ExtractedPrice string `json:"extracted_price"`
 }
