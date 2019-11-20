@@ -61,12 +61,12 @@ type ShoppingResult struct {
 
 // OrganicResult ...
 type OrganicResult struct {
-	Title          string `json:"title,omitempty"`
-	CachedPageLink string `json:"cached_page_link,omitempty"`
-	DisplayedLink  string `json:"displayed_link,omitempty"`
-	Link           string `json:"link,omitempty"`
-	Source         string `json:"source"`
-	Snippet        string `json:"snippet,omitempty"`
-	Price          string `json:"price,omitempty"`
-	ExtractedPrice string `json:"extracted_price"`
+	Title          string  `json:"title,omitempty"`
+	CachedPageLink string  `json:"cached_page_link,omitempty"`
+	DisplayedLink  string  `json:"displayed_link,omitempty"`
+	Link           string  `json:"link,omitempty"`
+	Source         string  `json:"source"`
+	Snippet        string  `json:"snippet,omitempty"`
+	Price          string  `json:"price,omitempty"`
+	ExtractedPrice float64 `json:"extracted_price"`
 }
