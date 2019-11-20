@@ -56,7 +56,7 @@ type ShoppingResult struct {
 	Thumbnail         string   `json:"thumbnail"`
 	Title             string   `json:"title"`
 	Price             string   `json:"price"`
-	ExtractedPrice    string   `json:"extracted_price"`
+	ExtractedPrice    float64  `json:"extracted_price"`
 }
 
 // OrganicResult ...

@@ -134,7 +134,7 @@ func TestDecodeJson(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	var sq SerpQuery
+	var sq Query
 	rsp, err := sq.decodeJSON(reader)
 	if err != nil {
 		t.Error("error should be nil", err)
@@ -153,7 +153,7 @@ func TestDecodeJsonPage20(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	var sq SerpQuery
+	var sq Query
 	rsp, err := sq.decodeJSON(reader)
 	if err != nil {
 		t.Error("error should be nil")
@@ -171,7 +171,7 @@ func TestDecodeJsonError(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	var sq SerpQuery
+	var sq Query
 	_, err = sq.decodeJSON(reader)
 	if err != nil {
 		t.Error(err)
@@ -189,7 +189,7 @@ func TestDecodeJsonError(t *testing.T) {
 func TestGetLocation(t *testing.T) {
 	setup()
 
-	var rsp SerpResponseArray
+	var rsp ResponseArray
 	var err error
 	rsp, err = GetLocation("Austin", 3)
 

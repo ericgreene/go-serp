@@ -7,6 +7,7 @@ package serp
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -17,23 +18,23 @@ import (
 // Hold SerpApi user key
 var apiKey string
 
-// SerpQuery hold query parameter
-type SerpQuery struct {
+// Query hold query parameter
+type Query struct {
 	parameter map[string]string
 }
 
-// SerpResponse hold response
-type SerpResponse map[string]interface{}
+// Response hold response
+type Response map[string]interface{}
 
-// SerpResponseArray hold response array
-type SerpResponseArray []interface{}
+// ResponseArray hold response array
+type ResponseArray []interface{}
 
 // NewGoogleSearch initialize the query
-func NewGoogleSearch(parameter map[string]string) SerpQuery {
+func NewGoogleSearch(parameter map[string]string) Query {
 	if len(apiKey) > 0 {
 		parameter["api_key"] = apiKey
 	}
-	return SerpQuery{parameter: parameter}
+	return Query{parameter: parameter}
 }
 
 // Set your API KEY
@@ -42,24 +43,33 @@ func setAPIKey(key string) {
 }
 
 // GetJSON returns SerpResponse containing
-func (sq *SerpQuery) GetJSON() (Results, error) {
-	rsp := sq.execute("/search", "json")
+func (sq *Query) GetJSON() (Results, error) {
+	rsp, err := sq.execute("/search", "json")
+	if err != nil {
+		return Results{}, err
+	}
 	return sq.decodeJSON(rsp.Body)
 }
 
 // GetHTML returns html as a string
-func (sq *SerpQuery) GetHTML() (*string, error) {
-	rsp := sq.execute("/search", "html")
+func (sq *Query) GetHTML() (*string, error) {
+	rsp, err := sq.execute("/search", "html")
+	if err != nil {
+		return nil, err
+	}
 	return sq.decodeHTML(rsp.Body)
 }
 
 // GetLocation returns closest location
-func GetLocation(q string, limit int) (SerpResponseArray, error) {
+func GetLocation(q string, limit int) (ResponseArray, error) {
 	client := NewGoogleSearch(map[string]string{
 		"q":     q,
 		"limit": string(limit),
 	})
-	rsp := client.execute("/locations.json", "json")
+	rsp, err := client.execute("/locations.json", "json")
+	if err != nil {
+		return ResponseArray{}, err
+	}
 	return client.decodeJSONArray(rsp.Body)
 }
 
@@ -71,20 +81,23 @@ func GetLocation(q string, limit int) (SerpResponseArray, error) {
 // }
 
 // GetSearchArchive retrieve search from the archive using the Search Archive API
-func (sq *SerpQuery) GetSearchArchive(searchID string) (Results, error) {
-	rsp := sq.execute("/searches/"+searchID+".json", "json")
+func (sq *Query) GetSearchArchive(searchID string) (Results, error) {
+	rsp, err := sq.execute("/searches/"+searchID+".json", "json")
+	if err != nil {
+		return Results{}, err
+	}
 	return sq.decodeJSON(rsp.Body)
 }
 
 // decodeJson response
-func (sq *SerpQuery) decodeJSON(body io.ReadCloser) (Results, error) {
+func (sq *Query) decodeJSON(body io.ReadCloser) (Results, error) {
 	// Decode JSON from response body
 	decoder := json.NewDecoder(body)
 	// var serpResponse SerpResponse
 	var resp Results
 	err := decoder.Decode(&resp)
 	if err != nil {
-		return resp, errors.New("fail to decode")
+		return resp, fmt.Errorf("fail to decode: %w", err)
 	}
 
 	// check error message
@@ -96,9 +109,9 @@ func (sq *SerpQuery) decodeJSON(body io.ReadCloser) (Results, error) {
 }
 
 // decodeJSONArray primitive function
-func (sq *SerpQuery) decodeJSONArray(body io.ReadCloser) (SerpResponseArray, error) {
+func (sq *Query) decodeJSONArray(body io.ReadCloser) (ResponseArray, error) {
 	decoder := json.NewDecoder(body)
-	var rsp SerpResponseArray
+	var rsp ResponseArray
 	err := decoder.Decode(&rsp)
 	if err != nil {
 		return nil, errors.New("fail to decode array")
@@ -107,7 +120,7 @@ func (sq *SerpQuery) decodeJSONArray(body io.ReadCloser) (SerpResponseArray, err
 }
 
 // decodeHTML primitive function
-func (sq *SerpQuery) decodeHTML(body io.ReadCloser) (*string, error) {
+func (sq *Query) decodeHTML(body io.ReadCloser) (*string, error) {
 	buffer, err := ioutil.ReadAll(body)
 	if err != nil {
 		panic(err)
@@ -117,7 +130,7 @@ func (sq *SerpQuery) decodeHTML(body io.ReadCloser) (*string, error) {
 }
 
 // Execute the HTTP get
-func (sq *SerpQuery) execute(path string, output string) *http.Response {
+func (sq *Query) execute(path string, output string) (*http.Response, error) {
 	query := url.Values{}
 	for k, v := range sq.parameter {
 		query.Add(k, v)
@@ -129,9 +142,5 @@ func (sq *SerpQuery) execute(path string, output string) *http.Response {
 		Timeout: time.Second * 60,
 	}
 	rsp, err := client.Get(endpoint)
-
-	if err != nil {
-		panic(err.Error())
-	}
-	return rsp
+	return rsp, err
 }
