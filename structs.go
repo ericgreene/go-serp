@@ -1,4 +1,4 @@
-package google_search_results
+package serp
 
 // Results ...
 type Results struct {

@@ -1,4 +1,4 @@
-package google_search_results
+package serp
 
 /*
  * This package enables to interact with SerpApi server
